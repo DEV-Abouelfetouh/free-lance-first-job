@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>كويز مانيا - مسابقة الثقافة العامة</title>
+    <style>
+        /* التحديثات الجديدة */
+        .option-number {
+            margin-right: 15px; /* تغيير من left إلى right */
+            margin-left: 0; /* إزالة الهوامش اليسرى */
+        }
+        
+        .answer-btn {
+            justify-content: space-between; /* توزيع العناصر بشكل صحيح */
+            flex-direction: row-reverse; /* عكس ترتيب العناصر */
+            padding: 1rem 1.5rem; /* تعديل المساحة الداخلية */
+        }
+
+        /* بقية التنسيقات مع تعديلات بسيطة */
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            direction: rtl;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 800px;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #4B0082;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .question {
+            font-family: Verdana, sans-serif;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #4B0082;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .answers {
+            display: grid;
+            gap: 1.2rem;
+        }
+
+        .answer-btn {
+            background: #fff;
+            border: 2px solid #4B0082;
+            color: #4B0082;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-align: right;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-btn:hover {
+            background: #4B0082;
+            color: white;
+            transform: translateX(-10px);
+        }
+
+        .answer-btn.selected {
+            background: #4B0082;
+            color: white;
+            transform: translateX(-10px);
+        }
+
+        .controls {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #next-btn {
+            background: #4B0082;
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        #next-btn:hover {
+            transform: scale(1.05);
+        }
+
+        #score {
+            font-size: 1.3rem;
+            color: #4B0082;
+            font-weight: bold;
+        }
+
+        #results {
+            text-align: center;
+            font-size: 2rem;
+            margin-top: 2rem;
+            color: #4B0082;
+            padding: 2rem;
+            background: #f8f8f8;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .option-number {
+            background: #4B0082;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>مسابقة كويز مانيا 🎉</h1>
+        <div class="question-box">
+            <div id="question" class="question"></div>
+            <div class="answers" id="answers"></div>
+        </div>
+        <div class="controls">
+            <button id="next-btn">التالي ➔</button>
+            <div id="score">النقاط: 0</div>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "ما هي عاصمة المملكة العربية السعودية؟",
+                answers: ["جدة", "الرياض", "مكة المكرمة", "الدمام"],
+                correct: 1
+            },
+            {
+                question: "كم عدد أيام السنة الكبيسة؟",
+                answers: ["365", "366", "364", "367"],
+                correct: 1
+            },
+            {
+                question: "أي من هذه الكواكب أقرب إلى الشمس؟",
+                answers: ["الزهرة", "المريخ", "المشتري", "عطارد"],
+                correct: 3
+            },
+            {
+                question: "ما اسم أطول نهر في العالم؟",
+                answers: ["نهر النيل", "نهر الأمازون", "نهر اليانغتسي", "نهر المسيسيبي"],
+                correct: 0
+            },
+            {
+                question: "في أي عام هجري تحولت القبلة من المسجد الأقصى إلى الكعبة؟",
+                answers: ["1 هـ", "2 هـ", "3 هـ", "4 هـ"],
+                correct: 1
+            },
+            {
+                question: "ما هي اللغة الرسمية للبرازيل؟",
+                answers: ["الإسبانية", "الإنجليزية", "البرتغالية", "الفرنسية"],
+                correct: 2
+            },
+            {
+                question: "ما اسم العملة اليابانية؟",
+                answers: ["الدولار", "الين", "اليورو", "الجنيه"],
+                correct: 1
+            },
+            {
+                question: "كم عدد أحرف اللغة العربية؟",
+                answers: ["26", "28", "30", "32"],
+                correct: 1
+            },
+            {
+                question: "أي من هذه الدول تقع في قارة أفريقيا؟",
+                answers: ["ماليزيا", "الأرجنتين", "كينيا", "جورجيا"],
+                correct: 2
+            },
+            {
+                question: "ما هو المعدن السائل في درجة حرارة الغرفة؟",
+                answers: ["الحديد", "النحاس", "الزئبق", "الذهب"],
+                correct: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+        function showQuestion() {
+            const questionEl = document.getElementById('question');
+            const answersEl = document.getElementById('answers');
+            
+            questionEl.textContent = `السؤال ${currentQuestion + 1}: ${questions[currentQuestion].question}`;
+            answersEl.innerHTML = '';
+            
+            questions[currentQuestion].answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.className = 'answer-btn';
+                button.innerHTML = `
+                    ${answer}
+                    <span class="option-number">${index + 1}</span>
+                `;
+                button.onclick = () => selectAnswer(index);
+                answersEl.appendChild(button);
+            });
+        }
+
+        function selectAnswer(index) {
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            buttons[index].classList.add('selected');
+            selectedAnswer = index;
+        }
+
+        function checkAnswer() {
+            if(selectedAnswer === questions[currentQuestion].correct) {
+                score++;
+                document.getElementById('score').textContent = `النقاط: ${score}`;
+            }
+        }
+
+        function showResults() {
+            document.getElementById('question').style.display = 'none';
+            document.getElementById('answers').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+            
+            const resultsEl = document.getElementById('results');
+            resultsEl.style.display = 'block';
+            resultsEl.innerHTML = `
+                <h2>النتيجة النهائية 🏆</h2>
+                <p>إجابات صحيحة: ${score}/${questions.length}</p>
+                <p>النسبة المئوية: ${Math.round((score/questions.length)*100)}%</p>
+                <button onclick="location.reload()" style="
+                    background: #4B0082;
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    margin-top: 1rem;
+                    font-size: 1.2rem;
+                ">
+                    إعادة المحاولة
+                </button>
+            `;
+        }
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if(selectedAnswer === null) {
+                alert('الرجاء اختيار إجابة قبل المتابعة');
+                return;
+            }
+            
+            checkAnswer();
+            currentQuestion++;
+            selectedAnswer = null;
+            
+            if(currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        // بدء الاختبار
+        showQuestion();
+    </script>
+</body>
+</html>
